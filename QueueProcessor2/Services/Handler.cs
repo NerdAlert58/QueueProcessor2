@@ -10,6 +10,7 @@ namespace QueueProcessor2.Services
     public class Handler
     {
         private IList<Proc> _processes { get; set; }
+        private IList<Proc> _finished { get; set; }
         private int _timeQuantum_1 { get; set; }
         private int _timeQuantum_2 { get; set; }
         private Proc _currentProc { get; set; }
@@ -26,6 +27,7 @@ namespace QueueProcessor2.Services
         public Handler(IList<Proc> processes)
         {
             _processes = processes ?? throw new ArgumentNullException(nameof(processes));
+            _finished = new List<Proc>();
             _timeQuantum_1 = 3;
             _timeQuantum_2 = 4;
             _currentProc = null;
@@ -83,7 +85,7 @@ namespace QueueProcessor2.Services
                         {
                             if (_currentProc.Priority <= arr.Priority)
                             {
-                                switch(arr.Priority)
+                                switch (arr.Priority)
                                 {
                                     case 1:
                                         waitQueue_1.Add(arr);
@@ -95,7 +97,7 @@ namespace QueueProcessor2.Services
                                         break;
                                     default:
                                         throw new ArgumentNullException("Process priority MUST be 1 or 2 for this algorithm.");
-                                }                                
+                                }
                             }
                             else
                             {
@@ -115,15 +117,7 @@ namespace QueueProcessor2.Services
                                             throw new ArgumentNullException("Process priority MUST be 1 or 2 for this algorithm.");
                                     }
                                 }
-                                _currentProc = arr;
-                                timeQuantum = _currentProc.Priority == 1 ? _timeQuantum_1 : _timeQuantum_2;
-                            }
-                        }
-                        else
-                        {
-                            if (!arr.Finished)
-                            {
-                                if (waitQueue_1.Count > 0 || waitQueue_2.Count > 0)
+                                if (!arr.Finished)
                                 {
                                     switch (arr.Priority)
                                     {
@@ -139,11 +133,26 @@ namespace QueueProcessor2.Services
                                             throw new ArgumentNullException("Process priority MUST be 1 or 2 for this algorithm.");
                                     }
                                 }
-                                else
+                                _currentProc = null;
+                            }
+                        }
+                        else
+                        {
+                            if (!arr.Finished)
+                            {
+                                switch (arr.Priority)
                                 {
-                                    _currentProc = arr;
-                                    timeQuantum = _currentProc.Priority == 1 ? _timeQuantum_1 : _timeQuantum_2;
-                                }                                
+                                    case 1:
+                                        waitQueue_1.Add(arr);
+                                        waitQueue_1.Sort(delegate (Proc x, Proc y) { return y.Priority.CompareTo(x.Priority); });
+                                        break;
+                                    case 2:
+                                        waitQueue_2.Add(arr);
+                                        waitQueue_2.Sort(delegate (Proc x, Proc y) { return y.Priority.CompareTo(x.Priority); });
+                                        break;
+                                    default:
+                                        throw new ArgumentNullException("Process priority MUST be 1 or 2 for this algorithm.");
+                                }
                             }
                         }
                     }
@@ -200,11 +209,27 @@ namespace QueueProcessor2.Services
                     }
                 }
 
+                if (_processes.Any(x => x.Finished == true))
+                {
+                    for (int i = 0; i < _processes.Count; i++)
+                    {
+                        var proc = _processes[i];
+                        if (proc.Finished)
+                        {
+                            if (!_finished.Contains(proc))
+                            {
+                                _finished.Add(proc);
+                            }
+                        }
+                    }
+                }
+
                 // create Event object and add to events
                 _events[index] = new Event()
                 {
                     Index = index,
                     Processes = CloneProcs(_processes),
+                    Finished = CloneProcs(_finished),
                     Waiting_1 = CloneProcs(waitQueue_1),
                     Waiting_2 = CloneProcs(waitQueue_2),
                     CurrentProc = _currentProc.Clone(),
@@ -265,6 +290,8 @@ namespace QueueProcessor2.Services
             var processes = _events[last].Processes;
             var waitTime = 0;
             var turnAroundTime = 0;
+            var sbTurn = new StringBuilder();
+            var sbWait = new StringBuilder();
 
             for (int i = 0; i < processes.Count; i++)
             {
@@ -272,13 +299,17 @@ namespace QueueProcessor2.Services
                 process.FinalizeValues();
                 waitTime += process.WaitTime;
                 turnAroundTime += process.TurnAroundTime;
+                sbTurn.AppendLine($"{process.Name}: {process.TurnAroundTime} units");
+                sbWait.AppendLine($"{process.Name}: {process.WaitTime} units");
             }
 
             _results = new ProcResults()
             {
                 AverageTurnAroundTime = (float)turnAroundTime / processes.Count,
                 AverageWaitTime = (float)waitTime / processes.Count,
-                CPUUtilization = (float)(last-_idleTime) / last
+                CPUUtilization = (float)(last - _idleTime) / last,
+                WaitTimes = sbWait.ToString(),
+                TurnAroundTimes = sbTurn.ToString()
             };
 
             return (_events, _results);
@@ -295,16 +326,7 @@ namespace QueueProcessor2.Services
             for (int i = 0; i < procs.Count; i++)
             {
                 var proc = procs[i];
-                clones.Add(new Proc()
-                {
-                    Name = proc.Name,
-                    Color = proc.Color,
-                    Burst = proc.Burst,
-                    Arrival = proc.Arrival,
-                    Finished = proc.Finished,
-                    FinishedAtIndex = proc.FinishedAtIndex,
-                    LastStartProcessing = proc.LastStartProcessing
-                });
+                clones.Add(proc.Clone());
             }
             return clones;
         }

@@ -5,8 +5,78 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QueueProcessor2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="700" Width="1050">
+	<Grid>
+		<Grid Margin="250,0,250,500">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			<Label Grid.Column="0">Process</Label>
+			<Label Grid.Column="1">Burst Time</Label>
+			<Label Grid.Column="2" Content="Priority Queue"/>
+			<Label Grid.Column="3" Content="Arrival Time"/>
+
+			<TextBox Grid.Row="1" Text="P1"/>
+			<TextBox Grid.Row="2" Text="P2"/>
+			<TextBox Grid.Row="3" Text="P3"/>
+			<TextBox Grid.Row="4" Text="P4"/>
+			<TextBox Grid.Row="5">P5</TextBox>
+
+			<TextBox Grid.Row="1" Grid.Column="1" x:Name="burst1" Text="12"/>
+			<TextBox Grid.Row="2" Grid.Column="1" x:Name="burst2" Text="8"/>
+			<TextBox Grid.Row="3" Grid.Column="1" x:Name="burst3" Text="6"/>
+			<TextBox Grid.Row="4" Grid.Column="1" x:Name="burst4" Text="5"/>
+			<TextBox Grid.Row="5" Grid.Column="1" x:Name="burst5" Text="10"/>
+
+			<TextBox Grid.Row="1" Grid.Column="2" x:Name="priority1" Text="1"/>
+			<TextBox Grid.Row="2" Grid.Column="2" x:Name="priority2" Text="2"/>
+			<TextBox Grid.Row="3" Grid.Column="2" x:Name="priority3" Text="1"/>
+			<TextBox Grid.Row="4" Grid.Column="2" x:Name="priority4" Text="2"/>
+			<TextBox Grid.Row="5" Grid.Column="2" x:Name="priority5" Text="2"/>
+
+			<TextBox Grid.Row="1" Grid.Column="3" Name="arrival1" Text="0"></TextBox>
+			<TextBox Grid.Row="2" Grid.Column="3" x:Name="arrival2" Text="4"/>
+			<TextBox Grid.Row="3" Grid.Column="3" x:Name="arrival3" Text="5"/>
+			<TextBox Grid.Row="4" Grid.Column="3" x:Name="arrival4" Text="12"/>
+			<TextBox Grid.Row="5" Grid.Column="3" Name="arrival5" Text="18"></TextBox>
+			<Button Grid.Column="1" Name="buttoncalc" Margin="84,39,0,-38" Grid.Row="5" Click="buttonCalc" HorizontalAlignment="Left" Width="104" Grid.ColumnSpan="2" >Calculate</Button>
+			<Button Grid.Column="1" Name="buttonReset" Grid.Row="5" HorizontalAlignment="Left" Width="103" Grid.ColumnSpan="2" Margin="84,72,0,-72" Click="buttonReset_Click" >Reset</Button>
+		</Grid>
+
+		<Button Content="1" Name="button1" HorizontalAlignment="Left"  Margin="488,333,0,0" Click="IndexAdjust1" VerticalAlignment="Top" Width="76" Visibility="Hidden"/>
+		<Button Content="5" Name="button2" HorizontalAlignment="Left" Margin="569,333,0,0" Click="IndexAdjust5" VerticalAlignment="Top" Width="76" Visibility="Hidden"/>
+		<Button Content="10" Name="button3" HorizontalAlignment="Left" Margin="650,333,0,0" Click="IndexAdjust10" VerticalAlignment="Top" Width="76" Visibility="Hidden"/>
+		<Button Content="-1" Name="button4" HorizontalAlignment="Left"  Margin="407,333,0,0" Click="IndexAdjustm1" VerticalAlignment="Top" Width="76" Visibility="Hidden"/>
+		<Button Content="-5" Name="button5" HorizontalAlignment="Left"  Margin="326,333,0,0" Click="IndexAdjustm5" VerticalAlignment="Top" Width="76" Visibility="Hidden"/>
+		<Button Content="-10" Name="button6" HorizontalAlignment="Left"  Margin="245,333,0,0" Click="IndexAdjustm10" VerticalAlignment="Top" Width="76" Visibility="Hidden"/>
+
+		<Label Content="Current Time:" HorizontalAlignment="Left" Margin="419,285,0,0" VerticalAlignment="Top" FontSize="18"/>
+		<Label x:Name="timeBox" Content="" HorizontalAlignment="Left" Margin="536,285,0,0" VerticalAlignment="Top" Width="130" FontSize="18"/>
+		<Label Content="Quantum Left:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="488,358,0,0" FontSize="18"/>
+		<Label x:Name="currentProcess" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="250,358,0,0" FontSize="18" RenderTransformOrigin="0.529,0.5" Width="116"/>
+		<Label Content="Current Process:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="108,358,0,0" FontSize="18"/>
+		<Label x:Name="qRemaining" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="616,358,0,0" FontSize="18"/>
+		<Label x:Name="waitingProcess1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="260,415,0,0" FontSize="18" RenderTransformOrigin="1.596,-0.515"/>
+		<Label Content="Queue 1 Waiting:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="108,415,0,0" FontSize="18"/>
+		<Label x:Name="waitingProcess2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="260,470,0,0" FontSize="18" RenderTransformOrigin="1.596,-0.515"/>
+		<Label Content="Queue 2 Waiting:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="108,470,0,0" FontSize="18"/>
+		<Label Content="Finished Processes: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="488,415,0,0" FontSize="18"/>
+		<Label x:Name="finishedProcess" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="683,415,0,0" FontSize="18"/>
+		<Label Content="Gantt Chart:&#xD;&#xA;" HorizontalAlignment="Left" Margin="108,562,0,0" VerticalAlignment="Top" FontSize="18"/>
+		<TextBlock x:Name="ganttChart"  HorizontalAlignment="Left" Height="72" Margin="219,562,0,0" VerticalAlignment="Top" TextWrapping="Wrap" Width="756" FontSize="18"/>
+
+
+
+	</Grid>
 </Window>

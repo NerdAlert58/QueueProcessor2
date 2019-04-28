@@ -61,7 +61,7 @@ namespace QueueProcessor2.Objects
 
         private int CalculateWaitTime()
         {
-            return this.LastStartProcessing - this.InitialBurst - this.Arrival;
+            return this.FinishedAtIndex - this.InitialBurst - this.Arrival;
         }
     }
 
